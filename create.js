@@ -34,13 +34,13 @@ const argv = yargs(hideBin(process.argv))
   .argv;
 
 // Settings
-const NGINX_CONFIG_PATH = '/etc/nginx/sites-available';
-const NGINX_ENABLED_PATH = '/etc/nginx/sites-enabled';
+const NGINX_CONFIG_PATH = '/etc/nginx/conf.d';
+const NGINX_ENABLED_PATH = '';
 
 // Create Nginx configuration
 function createNginxConfig() {
   const { domain, port } = argv;
-  const configPath = path.join(NGINX_CONFIG_PATH, domain);
+  const configPath = path.join(NGINX_CONFIG_PATH, `${domain}.conf`);
 
   // Basic configuration template
   const configTemplate = `server {
@@ -63,6 +63,11 @@ function createNginxConfig() {
   console.log(`Creating Nginx configuration for ${domain} -> localhost:${port}`);
   
   try {
+    // Check if file exists and notify about override
+    if (fs.existsSync(configPath)) {
+      console.log(`Config file already exists at ${configPath}. Overriding...`);
+    }
+    
     fs.writeFileSync(configPath, configTemplate);
     console.log(`✅ Nginx configuration created at: ${configPath}`);
     return true;
@@ -73,28 +78,12 @@ function createNginxConfig() {
   }
 }
 
-// Create symlink in sites-enabled
+// Create symlink in sites-enabled (simplified for Amazon Linux/RHEL setup)
 function enableNginxConfig() {
-  const { domain } = argv;
-  const configPath = path.join(NGINX_CONFIG_PATH, domain);
-  const symlinkPath = path.join(NGINX_ENABLED_PATH, domain);
-  
-  console.log('Enabling Nginx configuration...');
-  
-  try {
-    // Remove existing symlink if it exists
-    if (fs.existsSync(symlinkPath)) {
-      fs.unlinkSync(symlinkPath);
-    }
-    
-    fs.symlinkSync(configPath, symlinkPath);
-    console.log(`✅ Nginx configuration enabled with symlink: ${symlinkPath}`);
-    return true;
-  } catch (err) {
-    console.error(`❌ Error enabling Nginx config: ${err.message}`);
-    console.error('You might need to run this script with sudo privileges');
-    return false;
-  }
+  // In Amazon Linux/RHEL Nginx setup, we don't need symlinks
+  // The .conf files in /etc/nginx/conf.d/ are automatically loaded
+  console.log('Nginx configuration is automatically loaded from conf.d directory');
+  return true;
 }
 
 // Reload Nginx to apply changes
