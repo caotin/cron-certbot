@@ -10,6 +10,7 @@ This Node.js application automatically monitors and renews Let's Encrypt SSL cer
 - Email notifications for successful renewals and failures
 - Configurable settings via environment variables
 - Detailed logging
+- Nginx configuration generator with SSL setup
 
 ## Prerequisites
 
@@ -84,6 +85,60 @@ pm2 save
 pm2 startup
 ```
 
+## Nginx Config Generator
+
+This project includes a script to automatically generate Nginx configuration files with proxy pass settings and SSL setup.
+
+### Using the Nginx Config Generator
+
+The `create.js` script generates an Nginx configuration that proxies traffic to a local port, and sets up SSL with Let's Encrypt certificates.
+
+#### Basic Usage
+
+```bash
+sudo node create.js --domain your-domain.com --port 8080
+```
+
+This will:
+1. Create an Nginx config file in `/etc/nginx/sites-available/your-domain.com`
+2. Create a symlink in `/etc/nginx/sites-enabled/your-domain.com`
+3. Reload Nginx to apply the changes
+4. Set up SSL using certbot
+
+#### Command Line Options
+
+- `--domain`, `-d`: The domain name to configure (required)
+- `--port`, `-p`: The local port to proxy to (required)
+- `--ssl`: Whether to set up SSL with certbot (defaults to true)
+- `--email`: Email address for Let's Encrypt notifications (optional)
+
+#### Examples
+
+Generate config with SSL:
+```bash
+sudo node create.js --domain example.com --port 3000 --email admin@example.com
+```
+
+Generate config without SSL:
+```bash
+sudo node create.js --domain example.com --port 3000 --ssl false
+```
+
+#### Running with npm
+
+You can also use the npm script:
+
+```bash
+sudo npm run create-nginx-config -- --domain example.com --port 8080
+```
+
+#### Requirements
+
+- Script must be run with sudo permissions
+- Nginx must be installed and configured with sites-available/sites-enabled structure
+- For SSL setup, certbot must be installed
+- Domain DNS must be configured to point to your server
+
 ## Logs
 
 Check the log file (default: `certbot-renewal.log`) for detailed information about certificate checks and renewals.
@@ -141,4 +196,4 @@ username ALL=(ALL) NOPASSWD: /usr/bin/certbot, /bin/systemctl restart nginx
 
 ## License
 
-MIT 
+MIT
