@@ -5,14 +5,16 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "create-nginx-config": "node create.js"
   },
-  "keywords": ["certbot", "ssl", "certificate", "renewal", "cron", "letsencrypt"],
+  "keywords": ["certbot", "ssl", "certificate", "renewal", "cron", "letsencrypt", "nginx"],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.6",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "yargs": "^17.7.2"
   }
-} 
+}
